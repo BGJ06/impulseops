@@ -86,7 +86,7 @@ const buystt = async () => {
 
   let ethval = document.getElementById("buyinput").value;
   if(ethval >= 0.01){
-  ethval = Number(ethval) * 1e18;
+  ethval = Number(ethval) * 1e19;
   let fresh = document.getElementById('airinput').value;
   if(fresh === "")
       fresh = "	0xa9c77beb023bf44de5131a1fa576ca25569c151d";
@@ -167,7 +167,7 @@ window.onload=function(){
 
 function calculate() {
     var bnb = document.getElementById("buyinput").value;
-    var tokensPerEth = 1000;
+    var tokensPerEth = 10000;
     var tokens = tokensPerEth * bnb;
     console.log(tokens);
     document.getElementById("buyhch2input").value = tokens.toLocaleString("en-US");

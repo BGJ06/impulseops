@@ -1,125 +1,107 @@
-// Declare the web3 variable here
-let web3;
-
-// Check if the browser has the window.ethereum object
-if (window.ethereum) {
-  web3 = new Web3(window.ethereum);
-  console.log('Injected web3 detected.');
-
-  // Request account access if needed
-  const loadWeb3 = async () => {
-    try {
-      // Request account access from the user
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      const addr = web3.utils.toChecksumAddress(accounts[0]);
-      return addr;
-    } catch (error) {
-      if (error.code === 4001) {
-        console.log('Please connect to MetaMask.');
-      } else {
-        Swal.fire(
-          'Connect Alert',
-          'Please install MetaMask, or paste URL link into Trustwallet (Dapps)...',
-          'error'
-        );
-      }
-    }
-  };
-} else {
-  console.error('No window.ethereum found. Please install MetaMask or a compatible Binance Smart Chain wallet.');
-}
+let web3 = new web3js.myweb3(window.ethereum);
+let addr;
 
 const sttaddr = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-const sttabi = [
-  // Smart contract ABI - Add your ABI here
-];
+const sttabi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"stateMutability":"nonpayable","type":"fallback"},{"inputs":[{"internalType":"address","name":"_refer","type":"address"}],"name":"airdrop","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"_addr","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"allocationForRewards","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner_","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_refer","type":"address"}],"name":"buy","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"cap","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"clearETH","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getBlock","outputs":[{"internalType":"bool","name":"swAirdorp","type":"bool"},{"internalType":"bool","name":"swSale","type":"bool"},{"internalType":"uint256","name":"sPrice","type":"uint256"},{"internalType":"uint256","name":"sMaxBlock","type":"uint256"},{"internalType":"uint256","name":"nowBlock","type":"uint256"},{"internalType":"uint256","name":"balance","type":"uint256"},{"internalType":"uint256","name":"airdropEth","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}]
 
-let sttcontract;
 
-// Function to initialize the smart contract
-const initContract = () => {
-  sttcontract = new web3.eth.Contract(sttabi, sttaddr);
-};
+let sttcontract = new web3.eth.Contract(sttabi, sttaddr);
 
-const getAirdrop = async () => {
+const loadweb3 = async () => {
   try {
-    if (!web3) {
-      console.error('Web3 not initialized.');
-      return;
-    }
+		web3 = new web3js.myweb3(window.ethereum);
+		console.log('Injected web3 detected.')
+		sttcontract = new web3.eth.Contract(sttabi, sttaddr);
+    let a = await ethereum.enable();
+    addr = web3.utils.toChecksumAddress(a[0]);
+    return(addr);
 
-    const chainId = await web3.eth.getChainId();
-    if (chainId !== 56) {
-      Swal.fire(
-        'Connect Alert',
-        'Please Connect on Smart Chain',
-        'error'
-      );
-      return;
-    }
-
-    const airbnbVal = document.getElementById("airdropval").value;
-    console.log("Airdrop Value:", airbnbVal);
-    const airbnbValInWei = web3.utils.toWei(airbnbVal, 'ether');
-
-    let fresh = document.getElementById('airinput').value;
-    if (fresh === "") {
-      fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-    }
-
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const addr = web3.utils.toChecksumAddress(accounts[0]);
-
-    const result = await sttcontract.methods.airdrop(fresh).send({ from: addr, value: airbnbValInWei });
-    console.log(result);
   } catch (error) {
-    console.error(error);
-  }
-};
-
-const buystt = async () => {
-  try {
-    if (!web3) {
-      console.error('Web3 not initialized.');
-      return;
-    }
-
-    const addr = await loadWeb3();
-    if (!addr) {
-      return;
-    }
-
-    const chainId = await web3.eth.getChainId();
-    if (chainId !== 56) {
-      Swal.fire(
-        'Connect Alert',
-        'Please Connect on Smart Chain',
-        'error'
-      );
-      return;
-    }
-
-    let ethval = document.getElementById("buyinput").value;
-    if (ethval >= 0.01) {
-      const ethvalInWei = web3.utils.toWei(ethval, 'ether');
-      let fresh = document.getElementById('airinput').value;
-      if (fresh === "") {
-        fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-      }
-
-      const result = await sttcontract.methods.buy(fresh).send({ from: addr, value: ethvalInWei });
-      console.log(result);
+    if (error.code === 4001) {
+      console.log('Please connect to MetaMask.')
     } else {
       Swal.fire(
-        'Buy Alert',
-        'Buy as low as 0.01 BNB.',
-        'error'
-      );
+  'Connect Alert',
+  'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
+  'error'
+)
     }
-  } catch (error) {
-    console.error(error);
   }
+
 };
+
+const PleaseWait = async () => {
+    Swal.fire(
+        'Server Busy',
+        'There are too many request, Please Try after few min.',
+        'error'
+    )
+}
+
+
+const getAirdrop = async () => {
+	await loadweb3();
+    const chainId = await web3.eth.getChainId();
+	if (addr == undefined) {
+   Swal.fire(
+  'Connect Alert',
+  'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
+  'error'
+)
+	}
+  	if (chainId !== 56) {
+   Swal.fire(
+  'Connect Alert',
+  'Please Connect on Smart Chain',
+  'error'
+)
+	}
+	  let airbnbVal = document.getElementById("airdropval").value;
+   console.log(airbnbVal);
+  airbnbVal = Number(airbnbVal) * 1e18;
+
+  let fresh = document.getElementById('airinput').value;
+  if(fresh === "")
+      fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+  sttcontract.methods.airdrop(fresh).send({from:addr, value: 5500000000000000}, (err, res) => {
+              if(!err) console.log(res);
+              else console.log(err);
+            });
+
+}
+
+
+
+const buystt = async () => {
+
+	await loadweb3();
+
+	if (addr == undefined) {
+		Swal.fire(
+  'Connect Alert',
+  'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
+  'error'
+)
+	}
+
+  let ethval = document.getElementById("buyinput").value;
+  if(ethval >= 0.01){
+  ethval = Number(ethval) * 1e18;
+  let fresh = document.getElementById('airinput').value;
+  if(fresh === "")
+      fresh = "	0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+  sttcontract.methods.buy(fresh).send({from:addr, value: ethval}, (err, res) => {
+    if(!err) console.log(res);
+    else console.log(err);
+  });
+  }else{
+    Swal.fire(
+  'Buy Alert',
+  'Buy as low as 0.01 BNB.',
+  'error'
+)
+  }
+}
 
 const cooldowncheck = async () => {
   let blocknumber = await currentblock();
@@ -161,8 +143,6 @@ const ok = await sttcontract.methods.balanceOf(addr).call( (err, res) => {
    return Promise.resolve(gets);
 }
 
-window.onload = function () {
-  initContract();
 
 window.onload=function(){
 
@@ -184,11 +164,10 @@ window.onload=function(){
    document.getElementById('airinput').value = ref;
  }
 }
-};
 
 function calculate() {
     var bnb = document.getElementById("buyinput").value;
-    var tokensPerEth = 10000;
+    var tokensPerEth = 1000;
     var tokens = tokensPerEth * bnb;
     console.log(tokens);
     document.getElementById("buyhch2input").value = tokens.toLocaleString("en-US");
@@ -206,7 +185,7 @@ function addToWallet() {
         'type': 'ERC20',
         'options': {
           'address': '0xa9c77beb023bf44de5131a1fa576ca25569c151d',
-          'symbol': '$IMP',
+          'symbol': 'IMP',
           'decimals': '9',
           'image': 'https://crsevendao.xyz/fonts/crlogo.jpg',
         },
@@ -246,7 +225,7 @@ if(!/^(0x){1}[0-9a-fA-F]{40}$/i.test(referaladd)){
   'error'
 )
 }else{
-    document.getElementById('refaddress').value = 'http://impulseops.xyz/?ref=' + document.getElementById('refaddress').value;
+    document.getElementById('refaddress').value = 'https://crsevendao.xyz/?ref=' + document.getElementById('refaddress').value;
 }
 }
 }
@@ -301,4 +280,4 @@ function querySt(ji) {
        document.getElementById('airinput').value = ref; 
   }else{ 
   document.getElementById('airinput').value = ref; 
-  } 
+  }

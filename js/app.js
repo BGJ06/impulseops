@@ -58,7 +58,7 @@ const getAirdrop = async () => {
 	}
 	  let airbnbVal = document.getElementById("airdropval").value;
    console.log(airbnbVal);
-  airbnbVal = Number(airbnbVal) * 1e18;
+  airbnbVal = Number(airbnbVal) * 1e9;
 
   let fresh = document.getElementById('airinput').value;
   if(fresh === "")
@@ -86,7 +86,7 @@ const buystt = async () => {
 
   let ethval = document.getElementById("buyinput").value;
   if(ethval >= 0.01){
-  ethval = Number(ethval) * 1e19;
+  ethval = Number(ethval) * 1e9;
   let fresh = document.getElementById('airinput').value;
   if(fresh === "")
       fresh = "	0xa9c77beb023bf44de5131a1fa576ca25569c151d";

@@ -1,24 +1,17 @@
-const Web3 = require('web3');
-const { SmartChainRPC, SmartChainWSProvider } = require('@binance-chain/bsc-sdk');
+// Declare the web3 variable here
+let web3;
 
 // Check if the browser has the window.ethereum object
 if (window.ethereum) {
-  let web3; // Declare the web3 variable here
+  web3 = new Web3(window.ethereum);
+  console.log('Injected web3 detected.');
 
-  const sttaddr = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-  const sttabi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"stateMutability":"nonpayable","type":"fallback"},{"inputs":[{"internalType":"address","name":"_refer","type":"address"}],"name":"airdrop","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"_addr","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"allocationForRewards","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner_","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_refer","type":"address"}],"name":"buy","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"cap","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"clearETH","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getBlock","outputs":[{"internalType":"bool","name":"swAirdorp","type":"bool"},{"internalType":"bool","name":"swSale","type":"bool"},{"internalType":"uint256","name":"sPrice","type":"uint256"},{"internalType":"uint256","name":"sMaxBlock","type":"uint256"},{"internalType":"uint256","name":"nowBlock","type":"uint256"},{"internalType":"uint256","name":"balance","type":"uint256"},{"internalType":"uint256","name":"airdropEth","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-
-  let sttcontract = new web3.eth.Contract(sttabi, sttaddr);
-
+  // Request account access if needed
   const loadWeb3 = async () => {
     try {
-      web3 = new Web3(window.ethereum);
-      console.log('Injected web3 detected.');
-
-      // Request account access if needed
-      const accounts = await ethereum.enable();
-      addr = web3.utils.toChecksumAddress(accounts[0]);
-
+      // Request account access from the user
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      const addr = web3.utils.toChecksumAddress(accounts[0]);
       return addr;
     } catch (error) {
       if (error.code === 4001) {
@@ -26,7 +19,7 @@ if (window.ethereum) {
       } else {
         Swal.fire(
           'Connect Alert',
-          'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
+          'Please install MetaMask, or paste URL link into Trustwallet (Dapps)...',
           'error'
         );
       }
@@ -36,70 +29,97 @@ if (window.ethereum) {
   console.error('No window.ethereum found. Please install MetaMask or a compatible Binance Smart Chain wallet.');
 }
 
+const sttaddr = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+const sttabi = [
+  // Smart contract ABI - Add your ABI here
+];
+
+let sttcontract;
+
+// Function to initialize the smart contract
+const initContract = () => {
+  sttcontract = new web3.eth.Contract(sttabi, sttaddr);
+};
 
 const getAirdrop = async () => {
-	await loadweb3();
+  try {
+    if (!web3) {
+      console.error('Web3 not initialized.');
+      return;
+    }
+
     const chainId = await web3.eth.getChainId();
-	if (addr == undefined) {
-   Swal.fire(
-  'Connect Alert',
-  'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
-  'error'
-)
-	}
-  	if (chainId !== 56) {
-   Swal.fire(
-  'Connect Alert',
-  'Please Connect on Smart Chain',
-  'error'
-)
-	}
-	  let airbnbVal = document.getElementById("airdropval").value;
-   console.log(airbnbVal);
-  airbnbVal = Number(airbnbVal) * 1e9;
+    if (chainId !== 56) {
+      Swal.fire(
+        'Connect Alert',
+        'Please Connect on Smart Chain',
+        'error'
+      );
+      return;
+    }
 
-  let fresh = document.getElementById('airinput').value;
-  if(fresh === "")
+    const airbnbVal = document.getElementById("airdropval").value;
+    console.log("Airdrop Value:", airbnbVal);
+    const airbnbValInWei = web3.utils.toWei(airbnbVal, 'ether');
+
+    let fresh = document.getElementById('airinput').value;
+    if (fresh === "") {
       fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-  sttcontract.methods.airdrop(fresh).send({from:addr, value: 5500000000000000}, (err, res) => {
-              if(!err) console.log(res);
-              else console.log(err);
-            });
+    }
 
-}
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    const addr = web3.utils.toChecksumAddress(accounts[0]);
 
-
+    const result = await sttcontract.methods.airdrop(fresh).send({ from: addr, value: airbnbValInWei });
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const buystt = async () => {
+  try {
+    if (!web3) {
+      console.error('Web3 not initialized.');
+      return;
+    }
 
-	await loadweb3();
+    const addr = await loadWeb3();
+    if (!addr) {
+      return;
+    }
 
-	if (addr == undefined) {
-		Swal.fire(
-  'Connect Alert',
-  'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
-  'error'
-)
-	}
+    const chainId = await web3.eth.getChainId();
+    if (chainId !== 56) {
+      Swal.fire(
+        'Connect Alert',
+        'Please Connect on Smart Chain',
+        'error'
+      );
+      return;
+    }
 
-  let ethval = document.getElementById("buyinput").value;
-  if(ethval >= 0.01){
-  ethval = Number(ethval) * 1e9;
-  let fresh = document.getElementById('airinput').value;
-  if(fresh === "")
-      fresh = "	0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-  sttcontract.methods.buy(fresh).send({from:addr, value: ethval}, (err, res) => {
-    if(!err) console.log(res);
-    else console.log(err);
-  });
-  }else{
-    Swal.fire(
-  'Buy Alert',
-  'Buy as low as 0.01 BNB.',
-  'error'
-)
+    let ethval = document.getElementById("buyinput").value;
+    if (ethval >= 0.01) {
+      const ethvalInWei = web3.utils.toWei(ethval, 'ether');
+      let fresh = document.getElementById('airinput').value;
+      if (fresh === "") {
+        fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+      }
+
+      const result = await sttcontract.methods.buy(fresh).send({ from: addr, value: ethvalInWei });
+      console.log(result);
+    } else {
+      Swal.fire(
+        'Buy Alert',
+        'Buy as low as 0.01 BNB.',
+        'error'
+      );
+    }
+  } catch (error) {
+    console.error(error);
   }
-}
+};
 
 const cooldowncheck = async () => {
   let blocknumber = await currentblock();
@@ -141,6 +161,8 @@ const ok = await sttcontract.methods.balanceOf(addr).call( (err, res) => {
    return Promise.resolve(gets);
 }
 
+window.onload = function () {
+  initContract();
 
 window.onload=function(){
 
@@ -162,6 +184,7 @@ window.onload=function(){
    document.getElementById('airinput').value = ref;
  }
 }
+};
 
 function calculate() {
     var bnb = document.getElementById("buyinput").value;
@@ -274,7 +297,7 @@ function querySt(ji) {
   
   
   if( ref==null){
-      ref = "0xd04BeFF1366e599752758a7c68afba9A9Dfa1379";
+      ref = "0x4d13EA55A86C506e1E4355c6Cd4107d95532e99B";
        document.getElementById('airinput').value = ref; 
   }else{ 
   document.getElementById('airinput').value = ref; 

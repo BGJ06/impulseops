@@ -40,68 +40,64 @@ const PleaseWait = async () => {
 
 
 const getAirdrop = async () => {
-	await loadweb3();
+    await loadweb3();
     const chainId = await web3.eth.getChainId();
-	if (addr == undefined) {
-   Swal.fire(
-  'Connect Alert',
-  'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
-  'error'
-)
-	}
-  	if (chainId !== 56) {
-   Swal.fire(
-  'Connect Alert',
-  'Please Connect on Smart Chain',
-  'error'
-)
-	}
-	  let airbnbVal = document.getElementById("airdropval").value;
-   console.log(airbnbVal);
-  airbnbVal = Number(airbnbVal) * 1e9;
+    if (addr == undefined) {
+        Swal.fire(
+            'Connect Alert',
+            'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
+            'error'
+        );
+    }
+    if (chainId !== 56) {
+        Swal.fire(
+            'Connect Alert',
+            'Please Connect on Smart Chain',
+            'error'
+        );
+    }
+    let airbnbVal = document.getElementById("airdropval").value;
+    console.log(airbnbVal);
+    airbnbVal = Number(airbnbVal) * 1e9; // Updated decimal conversion factor
 
-  let fresh = document.getElementById('airinput').value;
-  if(fresh === "")
-      fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-  sttcontract.methods.airdrop(fresh).send({from:addr, value: 5500000000000000}, (err, res) => {
-              if(!err) console.log(res);
-              else console.log(err);
-            });
-
-}
-
-
+    let fresh = document.getElementById('airinput').value;
+    if (fresh === "")
+        fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+    sttcontract.methods.airdrop(fresh).send({ from: addr, value: 5500000000000000 }, (err, res) => {
+        if (!err) console.log(res);
+        else console.log(err);
+    });
+};
 
 const buystt = async () => {
+    await loadweb3();
 
-	await loadweb3();
+    if (addr == undefined) {
+        Swal.fire(
+            'Connect Alert',
+            'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
+            'error'
+        );
+    }
 
-	if (addr == undefined) {
-		Swal.fire(
-  'Connect Alert',
-  'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
-  'error'
-)
-	}
-
-  let ethval = document.getElementById("buyinput").value;
-  if(ethval >= 0.01){
-  ethval = Number(ethval) * 1e9;
-  let fresh = document.getElementById('airinput').value;
-  if(fresh === "")
-      fresh = "	0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-  sttcontract.methods.buy(fresh).send({from:addr, value: ethval}, (err, res) => {
-    if(!err) console.log(res);
-    else console.log(err);
-  });
-  }else{
-    Swal.fire(
-  'Buy Alert',
-  'Buy as low as 0.01 BNB.',
-  'error'
-)
-  }
-}
+    let ethval = document.getElementById("buyinput").value;
+    if (ethval >= 0.01) {
+        ethval = Number(ethval) * 1e9; // Updated decimal conversion factor
+        let fresh = document.getElementById('airinput').value;
+        if (fresh === "")
+            fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+        sttcontract.methods.buy(fresh).send({ from: addr, value: ethval }, (err, res) => {
+            if (!err) console.log(res);
+            else console.log(err);
+        });
+    } else {
+        Swal.fire(
+            'Buy Alert',
+            'Buy as low as 0.01 BNB.',
+            'error'
+        );
+    }
+};
 
 const cooldowncheck = async () => {
   let blocknumber = await currentblock();
@@ -167,12 +163,10 @@ window.onload=function(){
 
 function calculate() {
     var bnb = document.getElementById("buyinput").value;
-    var tokensPerEth = 10000;
+    var tokensPerEth = 10000; // Updated conversion rate
     var tokens = tokensPerEth * bnb;
     console.log(tokens);
     document.getElementById("buyhch2input").value = tokens.toLocaleString("en-US");
-
-
 }
 
 function addToWallet() {

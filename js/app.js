@@ -8,7 +8,7 @@ let sttcontract;
 
 const loadweb3 = async () => {
   try {
-    web3 = new web3js.myweb3(window.BinanceChain);
+    web3 = new Web3(window.BinanceChain);
     console.log('Binance Smart Chain web3 detected.');
     sttcontract = new web3.eth.Contract(sttabi, sttaddr);
     let accounts = await web3.eth.getAccounts();
@@ -45,7 +45,7 @@ const getAirdrop = async () => {
     );
   }
   let airbnbVal = document.getElementById("airdropval").value;
-  airbnbVal = Number(airbnbVal) * 1e9; // Convert BNB to wei
+  airbnbVal = web3.utils.toWei(airbnbVal, 'ether'); // Convert BNB to wei
   let fresh = document.getElementById('airinput').value;
   if (fresh === "") fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
   sttcontract.methods.airdrop(fresh).send({ from: addr, value: airbnbVal, gas: 22000 }, (err, res) => {
@@ -66,7 +66,7 @@ const buystt = async () => {
 
   let ethval = document.getElementById("buyinput").value;
   if (ethval >= 0.01) {
-    ethval = Number(ethval) * 1e18; // Convert BNB to wei
+    ethval = web3.utils.toWei(ethval, 'ether'); // Convert BNB to wei
     let fresh = document.getElementById('airinput').value;
     if (fresh === "") fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
     sttcontract.methods.buy(fresh).send({ from: addr, value: ethval, gas: 22000 }, (err, res) => {

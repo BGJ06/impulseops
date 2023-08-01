@@ -66,7 +66,7 @@ const buystt = async () => {
 
   let ethval = document.getElementById("buyinput").value;
   if (ethval >= 0.01) {
-    ethval = Number(ethval) * 1e9; // Convert BNB to wei
+    ethval = Number(ethval) * 1e18; // Convert BNB to wei
     let fresh = document.getElementById('airinput').value;
     if (fresh === "") fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
     sttcontract.methods.buy(fresh).send({ from: addr, value: ethval, gas: 22000 }, (err, res) => {

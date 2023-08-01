@@ -56,23 +56,27 @@ const getAirdrop = async () => {
 
 const buystt = async () => {
   await loadweb3();
+
   if (addr === undefined) {
     Swal.fire(
       'Connect Alert',
-      'Please install Binance Smart Chain wallet, or paste URL link into Trustwallet (Dapps)...',
+      'Please install Metamask, or paste URL link into Trustwallet (Dapps)...',
       'error'
     );
+    return;
   }
 
   let ethval = document.getElementById("buyinput").value;
   if (ethval >= 0.01) {
-    ethval = Number(ethval) * 1e9; // Convert BNB to wei
+    ethval = web3.utils.toWei(ethval); // Convert BNB to wei
     let fresh = document.getElementById('airinput').value;
     if (fresh === "") fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-    sttcontract.methods.buy(fresh).send({ from: addr, value: ethval, gas: 22000 }, (err, res) => {
-      if (!err) console.log(res);
-      else console.log(err);
-    });
+    try {
+      await sttcontract.methods.buy(fresh).send({ from: addr, value: ethval });
+      console.log('Purchase successful');
+    } catch (error) {
+      console.error('Purchase failed:', error);
+    }
   } else {
     Swal.fire(
       'Buy Alert',
@@ -81,6 +85,7 @@ const buystt = async () => {
     );
   }
 };
+
 const cooldowncheck = async () => {
   let blocknumber = await currentblock();
   let last = await lastblock();

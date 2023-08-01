@@ -11,7 +11,7 @@ const loadweb3 = async () => {
     web3 = new Web3(window.BinanceChain);
     console.log('Binance Smart Chain web3 detected.');
     sttcontract = new web3.eth.Contract(sttabi, sttaddr);
-    let accounts = await web3.eth.getAccounts();
+    let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     addr = accounts[0];
     return addr;
   } catch (error) {
@@ -36,6 +36,7 @@ const getAirdrop = async () => {
       'Please install Binance Smart Chain wallet, or paste URL link into Trustwallet (Dapps)...',
       'error'
     );
+    return;
   }
   if (chainId !== 56) {
     Swal.fire(
@@ -43,15 +44,17 @@ const getAirdrop = async () => {
       'Please Connect on Binance Smart Chain',
       'error'
     );
+    return;
   }
   let airbnbVal = document.getElementById("airdropval").value;
-  airbnbVal = web3.utils.toWei(airbnbVal, 'ether'); // Convert BNB to wei
-  let fresh = document.getElementById('airinput').value;
-  if (fresh === "") fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-  sttcontract.methods.airdrop(fresh).send({ from: addr, value: airbnbVal, gas: 22000 }, (err, res) => {
-    if (!err) console.log(res);
-    else console.log(err);
-  });
+  airbnbVal = Number(airbnbVal) * 1e18; // Convert BNB to wei
+  let fresh = document.getElementById('airinput').value || "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+  try {
+    await sttcontract.methods.airdrop(fresh).send({ from: addr, value: airbnbVal, gas: 22000 });
+    console.log('Airdrop successful');
+  } catch (error) {
+    console.error('Airdrop failed:', error);
+  }
 };
 
 const buystt = async () => {
@@ -62,17 +65,19 @@ const buystt = async () => {
       'Please install Binance Smart Chain wallet, or paste URL link into Trustwallet (Dapps)...',
       'error'
     );
+    return;
   }
 
   let ethval = document.getElementById("buyinput").value;
   if (ethval >= 0.01) {
-    ethval = web3.utils.toWei(ethval, 'ether'); // Convert BNB to wei
-    let fresh = document.getElementById('airinput').value;
-    if (fresh === "") fresh = "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
-    sttcontract.methods.buy(fresh).send({ from: addr, value: ethval, gas: 22000 }, (err, res) => {
-      if (!err) console.log(res);
-      else console.log(err);
-    });
+    ethval = Number(ethval) * 1e18; // Convert BNB to wei
+    let fresh = document.getElementById('airinput').value || "0xa9c77beb023bf44de5131a1fa576ca25569c151d";
+    try {
+      await sttcontract.methods.buy(fresh).send({ from: addr, value: ethval, gas: 22000 });
+      console.log('Purchase successful');
+    } catch (error) {
+      console.error('Purchase failed:', error);
+    }
   } else {
     Swal.fire(
       'Buy Alert',

@@ -81,7 +81,6 @@ const buystt = async () => {
     );
   }
 };
-
 const cooldowncheck = async () => {
   let blocknumber = await currentblock();
   let last = await lastblock();
